@@ -1,2 +1,2 @@
 # PySudoku
-Sudoku grid creator and solver using Tkinter
+Sudoku game assistant
