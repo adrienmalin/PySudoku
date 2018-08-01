@@ -7,20 +7,107 @@ Sudoku game assistant
 Tested on Windows 10 with Python 3.6.3 and Linux Mint 18 with Python 3.5.1
 """
 try:
-    from tkinter            import *
-    from tkinter            import ttk
+    from tkinter import *
+    from tkinter import ttk
     from tkinter.filedialog import askopenfilename, asksaveasfilename
     from tkinter.messagebox import showinfo, showerror, askokcancel, askyesnocancel
-    from pickle             import Pickler, Unpickler, UnpicklingError
-    from itertools          import combinations
-    from os.path            import basename, dirname, exists
-    from random             import sample, shuffle
-    from webbrowser         import open as open_web_browser
-    from sys                import argv, exit
-    from string             import digits
+    from pickle import Pickler, Unpickler, UnpicklingError
+    from itertools import combinations
+    from os.path import basename, dirname, exists
+    from random import sample, shuffle
+    from webbrowser import open as open_web_browser
+    from sys import argv, exit
+    from string import digits
 except ImportError as e:
     exit(e.msg)
 
+
+# Labels
+APP_TITLE = "PySudoku"
+
+GRID_LABEL = "Grid"
+GENERATE_LABEL = "Generate..."
+CREATE_LABEL = "Create"
+EDIT_LABEL = "Edit"
+VALIDATE_LABEL = "Validate"
+SOLVE_LABEL = "Solve"
+
+GAME_LABEL = "Game"
+LOAD_LABEL = "Load..."
+SAVE_LABEL = "Save..."
+RESTART_LABEL = "Restart..."
+
+VIEW_LABEL = "View"
+THEME_LABEL = "Theme"
+SHOW_TIPS_LABEL = "Show tips"
+SHOW_CONFLICTS_LABEL = "Show conflicts"
+
+HELP_LABEL = "?"
+WIKI_LABEL = "Wikipedia"
+ABOUT_LABEL = "About..."
+
+GENERATE_PROGRESS_BOX_TITLE = "Grid generation"
+GENERATE_PROGRESS_BOX_TEXT = "Generating a new grid..."
+CLUES_DELETING_PROGRESS_BOX_TEXT = "Deleting clues..."
+CANCEL_AUTO_CREATE_BUTTON_TEXT = "Stop"
+
+VALIDATION_PROGRESS_BOX_TITLE = "Grid validation"
+VALIDATION_PROGRESS_BOX_TEXT = "Checking if grid has a unique solution..."
+
+NO_SOLUTION_MESSAGE_BOX_TITLE = "Can't solve grid"
+NO_SOLUTION_MESSAGE_BOX_TEXT = (
+    "Some boxes have no solution. "
+    "Please correct it."
+)
+NO_OTHER_SOLUTION_PROGESS_BOX_TEXT = "Checking if grid has other solutions..."
+
+INCORRECT_GRID_MESSAGE_BOX_TITLE = "Incorrect grid"
+SEVERAL_SOLUTIONS_MESSAGE_BOX_TEXT = "The grid has several solutions."
+CONFLICTS_MESSAGE_BOX_TEXT = (
+    "Some boxes from the same row, column or region "
+    "have same digit. Please correct them."
+)
+
+SOLVING_PROGRESS_BOX_TITLE = "Solving grid"
+CALCULATING_SURE_DIGITS_TEXT = "Calculating sure digits..."
+TESTS_PROGRESS_BOX_TEXT = "Test: {} on {}"
+NO_SOLUTION_EXCEPTION = (
+    "There are some error. "
+    "Please correct them to solve the grid."
+)
+CANCEL_EXCEPTION = "Cancelled"
+
+SOLVED_GRID_MESSAGE_BOX_TITLE = "Congratulations!"
+SOLVED_GRID_MESSAGE_BOX_TEXT = "The grid is solved."
+
+NB_CLUES_MESSAGE_BOX_TITLE = "Generate a new grid"
+NB_CLUES_INPUT_LABEL = "Please enter minimum number of clues:"
+HARDER_LABEL = "← harder"
+EASIER_LABEL = "easier →"
+CANCEL_BUTTON_TEXT = "Cancel"
+OK_BUTTON_TEXT = "OK"
+
+CANCELLED_PROGRESS_BOX_TEXT = "Cancelling..."
+STOPPING_PROGRESS_BOX_TEXT = "Stopping..."
+
+CONFIRM_ERASE_MESSAGE_BOX_TITLE = "Erase the current game?"
+CONFIRM_ERASE_MESSAGE_BOX_TEXT = "A game is in progress. Do you want to erase it?"
+
+OPEN_FILE_MESSAGE_BOX_TITLE = "Open game"
+FILE_TYPE_NAME = "PySudoku game"
+FILE_ERROR_MESSAGE_BOX_TITLE = "File error"
+CORRUPTED_FILE_MESSAGE_BOX_TEXT = "The file {} can't be read."
+FILE_NOT_FOUND_MESSAGE_BOX_TEXT = "The file {} can't be found."
+
+SAVE_FILE_MESSAGE_BOX_TITLE = "Save game"
+
+WIKI_URL = "https://en.wikipedia.org/wiki/Sudoku"
+
+ABOUT_MESSAGE_BOX_TITLE = "About PySudoku"
+ABOUT_MESSAGE_BOX_TEXT = "Author: Adrien Malingrey\n" "Licence: MIT"
+
+CLOSE_MESSAGE_BOX_TITLE = "Save game?"
+CLOSE_MESSAGE_BOX_TITLE = "A game is in progress. Would you like to save it?"
 
 # 16x16, 32x32, 48x48 gif images encoded in base64
 ICON16 = """
@@ -41,6 +128,7 @@ ICON16 = """
          sOCBAAgSIiCgcKGBhwYOIhAgYOHEigQgRkRI0WLHjBAlKmQ4UuNBAihTqlR5MIHLBARewixAs0DL
          lzEBAJhJ0WYAmTl3EijQ86bLmDhr+lzJNOVBpUNrgnz4tOdQqwYGDNhIVECBq14zauUqFarJA2jT
          ql17ICAAOw=="""
+
 ICON32 = """
          R0lGODlhIAAgAPcAAAAAAGlpaX9/f+0cJL23a6CgoPDmjOPj4/Dw8P///wAAAAAAAAAAAAAAAAAA
          AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
@@ -62,6 +150,7 @@ ICON32 = """
          mbLgxgIeaw7cWfFnApgJQL4LmLTlwZkXbpYc+TVssGdz60a7UG0AtxJ9/7YIm6/twV5FNi2u+jjh
          AEuXg35sOzXWAQNyLrwc2jh36iGxaymv3r35d+Phsw/dPt17++bpxzNnfBv6VOLF6SO3n1Xh7v9m
          bSbggH4FBAA7"""
+
 ICON48 = """
          R0lGODlhMAAwAPcAAAIAAAAADgkKCgAAEgkXHh0LAAAAOQQVJQcMcAMVeAQdfiI/am0GA20/IV9F
          K19ebX97RWNjbWRqbGhhaGtjbm9lbW9pZ2hoa2hob29qbW1sbGdwbGp1bHFqbHppbnptbX1obHZp
@@ -101,6 +190,7 @@ class CustomStyle(ttk.Style):
     """
     Manage widgets' style
     """
+
     def __init__(self, app):
         ttk.Style.__init__(self, app)
         self.app = app
@@ -121,30 +211,66 @@ class CustomStyle(ttk.Style):
                 self.element_create("clam.field", "from", "clam")
             except TclError:
                 pass
-            self.layout("Box.TEntry",
-                        [('Entry.clam.field', {'sticky': 'nswe', 'border': '1', 'children':
-                            [('Entry.padding', {'sticky': 'nswe', 'children':
-                                [('Entry.textarea', {'sticky': 'nswe'})]})]})])
-            self.configure("Box.TEntry",
-                           bordercolor     = "grey",
-                           background      = "grey",
-                           foreground      = "black",
-                           fieldbackground = "white")
+            self.layout(
+                "Box.TEntry",
+                [
+                    (
+                        "Entry.clam.field",
+                        {
+                            "sticky": "nswe",
+                            "border": "1",
+                            "children": [
+                                (
+                                    "Entry.padding",
+                                    {
+                                        "sticky": "nswe",
+                                        "children": [
+                                            ("Entry.textarea", {"sticky": "nswe"})
+                                        ],
+                                    },
+                                )
+                            ],
+                        },
+                    )
+                ],
+            )
+            self.configure(
+                "Box.TEntry",
+                bordercolor="grey",
+                background="grey",
+                foreground="black",
+                fieldbackground="white",
+            )
             if new_theme == "vista":
-                self.map  ("Box.TEntry",
-                           bordercolor = [("hover", "!focus", "!disabled", "black"), ("focus", "dodger blue")],
-                           background  = [("hover", "!focus", "!disabled", "black"), ("focus", "dodger blue")])
+                self.map(
+                    "Box.TEntry",
+                    bordercolor=[
+                        ("hover", "!focus", "!disabled", "black"),
+                        ("focus", "dodger blue"),
+                    ],
+                    background=[
+                        ("hover", "!focus", "!disabled", "black"),
+                        ("focus", "dodger blue"),
+                    ],
+                )
         # Define style for boxes with highlighted digits or digits' conflicts
-        self.configure("Box.TEntry",                            fieldbackground = "white", )
-        self.map      ("Box.TEntry",                            fieldbackground = [("disabled", "light grey")])
-        self.configure("HighlightArea.Box.TEntry",              fieldbackground = "light cyan", )
-        self.map      ("HighlightArea.Box.TEntry",              fieldbackground = [("disabled", "light steel blue")])
-        self.configure("HighlightBox.HighlightArea.Box.TEntry", foreground      = "midnight blue")
-        self.map      ("HighlightBox.HighlightArea.Box.TEntry", foreground      = [("disabled", "blue")])
-        self.configure("ErrorArea.Box.TEntry",                  fieldbackground = "khaki")
-        self.map      ("ErrorArea.Box.TEntry",                  fieldbackground = [("disabled", "dark khaki")])
-        self.configure("ErrorBox.ErrorArea.Box.TEntry",         foreground      = "red")
-        self.map      ("ErrorBox.ErrorArea.Box.TEntry",         foreground      = [("disabled", "red")])
+        self.configure("Box.TEntry", fieldbackground="white")
+        self.map("Box.TEntry", fieldbackground=[("disabled", "light grey")])
+        self.configure("HighlightArea.Box.TEntry", fieldbackground="light cyan")
+        self.map(
+            "HighlightArea.Box.TEntry",
+            fieldbackground=[("disabled", "light steel blue")],
+        )
+        self.configure(
+            "HighlightBox.HighlightArea.Box.TEntry", foreground="midnight blue"
+        )
+        self.map(
+            "HighlightBox.HighlightArea.Box.TEntry", foreground=[("disabled", "blue")]
+        )
+        self.configure("ErrorArea.Box.TEntry", fieldbackground="khaki")
+        self.map("ErrorArea.Box.TEntry", fieldbackground=[("disabled", "dark khaki")])
+        self.configure("ErrorBox.ErrorArea.Box.TEntry", foreground="red")
+        self.map("ErrorBox.ErrorArea.Box.TEntry", foreground=[("disabled", "red")])
 
     def redraw(self):
         """
@@ -152,8 +278,10 @@ class CustomStyle(ttk.Style):
         Colorize boxes where highlighted digit can't be written
         and boxes with same digits in the same area
         """
-        if self.app.gr1d.progress_box\
-            and self.app.gr1d.progress_box.title() in ("Validation de la grille", "Génération d'une grille"):
+        if self.app.gr1d.progress_box and self.app.gr1d.progress_box.title() in (
+            VALIDATION_PROGRESS_BOX_TITLE,
+            GENERATE_PROGRESS_BOX_TITLE,
+        ):
             # Hide digits behind "?" when grid is validating
             for box in self.app.gr1d:
                 if box.instate(("!disabled",)):
@@ -162,8 +290,16 @@ class CustomStyle(ttk.Style):
             for box in self.app.gr1d:
                 box.configure(style="Box.TEntry", show="")
             # Disable highlight_button if all it's digit are solved
-            for digit, highlight_button in enumerate(self.app.highlight_buttons.buttons, start=1):
-                if sum(box.digit.get() == highlight_button.digit for box in self.app.gr1d) == 9:
+            for digit, highlight_button in enumerate(
+                self.app.highlight_buttons.buttons, start=1
+            ):
+                if (
+                    sum(
+                        box.digit.get() == highlight_button.digit
+                        for box in self.app.gr1d
+                    )
+                    == 9
+                ):
                     highlight_button.disable()
                 else:
                     highlight_button.enable()
@@ -179,48 +315,82 @@ class MenuBar(Menu):
     """
     Window menu bar
     """
+
     def __init__(self, app):
         Menu.__init__(self, app)
         self.app = app
         # Grid menu
         self.grid = IndexedMenu(app)
-        self.grid.add_command(    label="Générer...",               underline=0,  command=self.app.gr1d.open_nb_clues_message_box)
+        self.grid.add_command(
+            label=GENERATE_LABEL,
+            underline=0,
+            command=self.app.gr1d.open_nb_clues_message_box,
+        )
         self.grid.add_separator()
-        self.grid.add_command(    label="Créer",                    underline=0,  command=self.app.gr1d.create)
-        self.grid.add_command(    label="Éditer",                   underline=4,  command=self.app.gr1d.edit,     state=DISABLED)
-        self.grid.add_command(    label="Valider",                  underline=0,  command=self.app.gr1d.validate, state=DISABLED)
+        self.grid.add_command(
+            label=CREATE_LABEL, underline=0, command=self.app.gr1d.create
+        )
+        self.grid.add_command(
+            label=EDIT_LABEL, underline=4, command=self.app.gr1d.edit, state=DISABLED
+        )
+        self.grid.add_command(
+            label=VALIDATE_LABEL,
+            underline=0,
+            command=self.app.gr1d.validate,
+            state=DISABLED,
+        )
         self.grid.add_separator()
-        self.grid.add_command(    label="Résoudre",                 underline=0,  command=self.app.gr1d.solve,    state=DISABLED)
-        self.add_cascade(         label="Grille",                   underline=0,  menu=self.grid)
+        self.grid.add_command(
+            label=SOLVE_LABEL, underline=0, command=self.app.gr1d.solve, state=DISABLED
+        )
+        self.add_cascade(label=GRID_LABEL, underline=0, menu=self.grid)
         # Game menu
         self.game = IndexedMenu(app)
-        self.game.add_command(    label="Charger...",               underline=0,  command=self.app.game.open)
-        self.game.add_command(    label="Sauvegarder...",           underline=0,  command=self.app.game.save,     state=DISABLED)
+        self.game.add_command(label=LOAD_LABEL, underline=0, command=self.app.game.open)
+        self.game.add_command(
+            label=SAVE_LABEL, underline=0, command=self.app.game.save, state=DISABLED
+        )
         self.game.add_separator()
-        self.game.add_command(    label="Redémarrer...",            underline=0,  command=self.app.game.restart,  state=DISABLED)
-        self.add_cascade(         label="Partie",                   underline=0,  menu=self.game)
+        self.game.add_command(
+            label=RESTART_LABEL,
+            underline=0,
+            command=self.app.game.restart,
+            state=DISABLED,
+        )
+        self.add_cascade(label=GAME_LABEL, underline=0, menu=self.game)
         # View menu
         self.view = IndexedMenu(app)
         self.view.theme_menu = Menu(self.view, tearoff=0)
-        self.view.add_cascade(    label="Thème",                    underline=0,  menu=self.view.theme_menu)
+        self.view.add_cascade(label=THEME_LABEL, underline=0, menu=self.view.theme_menu)
         for label in self.app.style.theme_names():
-            self.view.theme_menu.add_radiobutton(label=label,       variable=self.app.style.theme)
+            self.view.theme_menu.add_radiobutton(
+                label=label, variable=self.app.style.theme
+            )
         self.view.add_separator()
-        self.view.add_checkbutton(label="Afficher les info-bulles", underline=13, variable=self.app.gr1d.tips_shown)
-        self.view.add_checkbutton(label="Afficher les conflits",    underline=13, variable=self.app.gr1d.conflicts_shown)
-        self.add_cascade(         label="Affichage",                underline=0,  menu=self.view)
+        self.view.add_checkbutton(
+            label=SHOW_TIPS_LABEL, underline=13, variable=self.app.gr1d.tips_shown
+        )
+        self.view.add_checkbutton(
+            label=SHOW_CONFLICTS_LABEL,
+            underline=13,
+            variable=self.app.gr1d.conflicts_shown,
+        )
+        self.add_cascade(label=VIEW_LABEL, underline=0, menu=self.view)
         # Help menu
         self.help = IndexedMenu(app)
-        self.help.add_command(    label="Wikipédia",                underline=0,  command=self.app.open_wiki)
+        self.help.add_command(label=WIKI_LABEL, underline=0, command=self.app.open_wiki)
         self.help.add_separator()
-        self.help.add_command(    label="À propos...",              underline=2,  command=self.app.show_about)
-        self.add_cascade(         label="?",                        underline=0,  menu=self.help)
+        self.help.add_command(
+            label=ABOUT_LABEL, underline=2, command=self.app.show_about
+        )
+        self.add_cascade(label=HELP_LABEL, underline=0, menu=self.help)
 
 
 class IndexedMenu(Menu):
     """
     tkinter.Menu redefined to get menus indices
     """
+
     def __init__(self, parent):
         Menu.__init__(self, parent, tearoff=0)
         self.labels = []
@@ -244,7 +414,9 @@ class IndexedMenu(Menu):
         elif isinstance(label_or_index, str):
             index = self.labels.index(label_or_index)
         else:
-            raise TypeError("label_or_index must be the entry index as int or its label as str")
+            raise TypeError(
+                "label_or_index must be the entry index as int or its label as str"
+            )
         if label:
             super().entryconfigure(index, label=label, **options)
             self.labels[index] = label
@@ -257,24 +429,48 @@ class Gr1d(Frame):
     The 9x9 boxes sudoku grid
     Leet speak for Grid not to confuse with tkinter.Grid class
     """
+
     def __init__(self, app):
         Frame.__init__(self, app)
         self.app = app
-        self.correct         = True
-        self.solutions       = self.solution_generator()
-        self.progress_box    = None
-        self.tips_shown      = IntVar(value=True)
+        self.correct = True
+        self.solutions = self.solution_generator()
+        self.progress_box = None
+        self.tips_shown = IntVar(value=True)
         self.conflicts_shown = IntVar(value=True)
         self.conflicts_shown.trace_variable("w", self.check)
-        self.regions = [[Region(self, reg_row, reg_col) for reg_col in range(3)] for reg_row in range(3)]
+        self.regions = [
+            [Region(self, reg_row, reg_col) for reg_col in range(3)]
+            for reg_row in range(3)
+        ]
         # Structures of boxes used by Gr1d.__iter__ and Box.neighbourhood
-        self.rows = [[Box(app, self, self.regions[row // 3][col // 3], row, col, row // 3 * 3 + col // 3)
-                      for col in range(9)] for row in range(9)]
-        self.boxes_of = {"row": self.rows,
-                         "col": [[self.rows[row][col] for row in range(9)] for col in range(9)],
-                         "reg": [[self.rows[row][col] for row in range(reg_row, reg_row + 3)
-                                  for col in range(reg_col, reg_col + 3)]
-                                 for reg_row in range(0, 9, 3) for reg_col in range(0, 9, 3)]}
+        self.rows = [
+            [
+                Box(
+                    app,
+                    self,
+                    self.regions[row // 3][col // 3],
+                    row,
+                    col,
+                    row // 3 * 3 + col // 3,
+                )
+                for col in range(9)
+            ]
+            for row in range(9)
+        ]
+        self.boxes_of = {
+            "row": self.rows,
+            "col": [[self.rows[row][col] for row in range(9)] for col in range(9)],
+            "reg": [
+                [
+                    self.rows[row][col]
+                    for row in range(reg_row, reg_row + 3)
+                    for col in range(reg_col, reg_col + 3)
+                ]
+                for reg_row in range(0, 9, 3)
+                for reg_col in range(0, 9, 3)
+            ],
+        }
         self.pack()
 
     def __getitem__(self, key):
@@ -306,10 +502,12 @@ class Gr1d(Frame):
 
     def auto_create(self, min_nb_clues):
         """ Automatic grid creation """
-        self.progress_box = ProgressBox(self.app,
-                                        "Génération d'une grille",
-                                        "Génération d'une nouvelle grille...",
-                                        maximum=81)
+        self.progress_box = ProgressBox(
+            self.app,
+            GENERATE_PROGRESS_BOX_TITLE,
+            GENERATE_PROGRESS_BOX_TEXT,
+            maximum=81,
+        )
         # Build a valid solution
         try:
             self.solve()
@@ -321,14 +519,20 @@ class Gr1d(Frame):
             remaining_boxes = [box for box in self]
             shuffle(remaining_boxes)
             nb_clues = len(remaining_boxes)
-            self.progress_box.text.set("Suppression d'indices...")
+            self.progress_box.text.set(CLUES_DELETING_PROGRESS_BOX_TEXT)
             self.progress_box.progress_bar.configure(maximum=81)
-            self.progress_box.cancel_button.configure(text="Arrêter", command=self.progress_box.on_stop)
+            self.progress_box.cancel_button.configure(
+                text=CANCEL_AUTO_CREATE_BUTTON_TEXT, command=self.progress_box.on_stop
+            )
             self.progress_box.cancel_button.bind("<space>", self.progress_box.on_stop)
             self.progress_box.bind("<Escape>", self.progress_box.on_stop)
             # Remove clues while the grid is valid
             # until the number of clues is near the number requested by user
-            while remaining_boxes and nb_clues > min_nb_clues and not self.progress_box.cancel_pressed:
+            while (
+                remaining_boxes
+                and nb_clues > min_nb_clues
+                and not self.progress_box.cancel_pressed
+            ):
                 box = remaining_boxes.pop(0)
                 tmp_digit = box.digit.get()
                 box.state(("!disabled",))
@@ -350,8 +554,8 @@ class Gr1d(Frame):
 
     def create(self, force=False):
         """ Make a blank grid to edit """
-        if  self.app.game.confirm_erase(force):
-            app.title("PySudoku")
+        if self.app.game.confirm_erase(force):
+            app.title(APP_TITLE)
             for box in self:
                 box.digit.set("")
             self.edit(force=True)
@@ -363,82 +567,89 @@ class Gr1d(Frame):
             self.app.game.restart(force=True)
             for box in self:
                 box.state(("!disabled",))
-            self.app.menu.grid.entryconfigure("Éditer",         state=DISABLED)
-            self.app.menu.grid.entryconfigure("Valider",        state=NORMAL)
-            self.app.menu.grid.entryconfigure("Résoudre",       state=DISABLED)
-            self.app.menu.game.entryconfigure("Charger...",     state=NORMAL)
-            self.app.menu.game.entryconfigure("Sauvegarder...", state=NORMAL)
-            self.app.menu.game.entryconfigure("Redémarrer...",  state=DISABLED)
+            self.app.menu.grid.entryconfigure(EDIT_LABEL, state=DISABLED)
+            self.app.menu.grid.entryconfigure(VALIDATE_LABEL, state=NORMAL)
+            self.app.menu.grid.entryconfigure(SOLVE_LABEL, state=DISABLED)
+            self.app.menu.game.entryconfigure(LOAD_LABEL, state=NORMAL)
+            self.app.menu.game.entryconfigure(SAVE_LABEL, state=NORMAL)
+            self.app.menu.game.entryconfigure(RESTART_LABEL, state=DISABLED)
 
     def validate(self):
         """ Check if grid is valid: if it has a unique solution """
         if self.correct:
             if not self.progress_box:
                 self.progress_box = ProgressBox(
-                        self.app, "Validation de la grille",
-                        "Vérification que la grille a une solution...",
-                        maximum=sum(len(box.possible_digits) for box in self if not box.digit.get()))
+                    self.app,
+                    VALIDATION_PROGRESS_BOX_TITLE,
+                    VALIDATION_PROGRESS_BOX_TEXT,
+                    maximum=sum(
+                        len(box.possible_digits) for box in self if not box.digit.get()
+                    ),
+                )
                 self.progress_box.variable.set(0)
             hidden_solutions = self.solution_generator()
             try:
                 next(hidden_solutions)
-            except StopIteration: # No solution
+            except StopIteration:  # No solution
                 self.app.game.restart(force=True)
-                if self.progress_box.title() == "Validation de la grille":
+                if self.progress_box.title() == VALIDATION_PROGRESS_BOX_TITLE:
                     self.progress_box.destroy()
                     self.progress_box = None
-                    showerror("Grille insoluble",
-                              "La grille comporte des cases sans valeur possible. "
-                              "Corrigez-les pour pouvoir Valider la grille.",
-                              icon="error")
+                    showerror(
+                        NO_SOLUTION_MESSAGE_BOX_TITLE,
+                        NO_SOLUTION_MESSAGE_BOX_TEXT,
+                        icon="error",
+                    )
                     self.edit()
                 else:
                     return False
             except CancelInterrupt:
                 self.app.game.restart(force=True)
-                if self.progress_box.title() == "Validation de la grille":
+                if self.progress_box.title() == VALIDATION_PROGRESS_BOX_TITLE:
                     self.progress_box.destroy()
                     self.progress_box = None
                     self.edit(force=True)
                 else:
                     return False
             else:
-                if self.progress_box.title() == "Validation de la grille":
-                    self.progress_box.text.set("Vérification qu'il n'y a pas d'autres solution...")
+                if self.progress_box.title() == VALIDATION_PROGRESS_BOX_TITLE:
+                    self.progress_box.text.set(NO_OTHER_SOLUTION_PROGESS_BOX_TEXT)
             try:
                 next(hidden_solutions)
             except StopIteration:  # Unique solution
                 self.app.game.restart(force=True)
-                if self.progress_box.title() == "Validation de la grille":
+                if self.progress_box.title() == VALIDATION_PROGRESS_BOX_TITLE:
                     self.progress_box.destroy()
                     self.progress_box = None
                 else:
                     return True
             except CancelInterrupt:
                 self.app.game.restart(force=True)
-                if self.progress_box.title() == "Validation de la grille":
+                if self.progress_box.title() == VALIDATION_PROGRESS_BOX_TITLE:
                     self.progress_box.destroy()
                     self.progress_box = None
                     self.edit(force=True)
                 else:
                     return False
-            else: # More than 1 solution
+            else:  # More than 1 solution
                 self.app.game.restart(force=True)
-                if self.progress_box.title() == "Validation de la grille":
+                if self.progress_box.title() == VALIDATION_PROGRESS_BOX_TITLE:
                     self.progress_box.destroy()
-                    showerror("Grille incorrecte",
-                              "La grille a plusieurs solutions possibles.",
-                              icon="error")
+                    showerror(
+                        INCORRECT_GRID_MESSAGE_BOX_TITLE,
+                        SEVERAL_SOLUTIONS_MESSAGE_BOX_TEXT,
+                        icon="error",
+                    )
                     self.edit(force=True)
                 else:
                     return False
         else:  # Incorrect grid
             if not self.progress_box:
-                showerror("Grille incorrecte",
-                          "La grille comporte des cases d'une même colonne, "
-                          "ligne ou région avec des valeurs identiques. "
-                          "Corrigez-les pour pouvoir Valider la grille.",
-                          icon="error")
+                showerror(
+                    INCORRECT_GRID_MESSAGE_BOX_TITLE,
+                    CONFLICTS_MESSAGE_BOX_TEXT,
+                    icon="error",
+                )
             return False
 
     def solve(self):
@@ -446,37 +657,44 @@ class Gr1d(Frame):
         if self.correct:
             if not self.progress_box:
                 self.progress_box = ProgressBox(
-                        self.app, "Résolution de la grille",
-                        "Cacul des valeurs sûres...",
-                        maximum = sum(len(box.possible_digits)
-                                for box in self if not box.digit.get()))
+                    self.app,
+                    SOLVING_PROGRESS_BOX_TITLE,
+                    CALCULATING_SURE_DIGITS_TEXT,
+                    maximum=sum(
+                        len(box.possible_digits) for box in self if not box.digit.get()
+                    ),
+                )
                 self.progress_box.variable.set(0)
             try:
                 next(self.solutions)
             except StopIteration as e:
-                self.app.menu.grid.entryconfigure("Résoudre", state=DISABLED)
-                if self.progress_box.title() == "Résolution de la grille":
+                self.app.menu.grid.entryconfigure(SOLVE_LABEL, state=DISABLED)
+                if self.progress_box.title() == SOLVING_PROGRESS_BOX_TITLE:
                     self.progress_box.destroy()
                     self.progress_box = None
-                    showerror("Grille insoluble", e.args[0] if e.args else "Pas de solution trouvée.", icon="error")
+                    showerror(
+                        NO_SOLUTION_MESSAGE_BOX_TITLE,
+                        e.args[0] if e.args else "Pas de solution trouvée.",
+                        icon="error",
+                    )
             except CancelInterrupt:
-                if self.progress_box.title() == "Résolution de la grille":
+                if self.progress_box.title() == SOLVING_PROGRESS_BOX_TITLE:
                     self.progress_box.destroy()
                     self.progress_box = None
                 else:
                     raise CancelInterrupt
             else:
-                self.app.menu.grid.entryconfigure("Résoudre", state=NORMAL)
-                if self.progress_box.title() == "Résolution de la grille":
+                self.app.menu.grid.entryconfigure(SOLVE_LABEL, state=NORMAL)
+                if self.progress_box.title() == SOLVING_PROGRESS_BOX_TITLE:
                     self.progress_box.destroy()
                     self.progress_box = None
         else:  # Incorrect grid
             if not self.progress_box:
-                showerror("Grille incorrecte",
-                          "La grille comporte des cases d'une même colonne, "
-                          "ligne ou région avec des valeurs identiques. "
-                          "Corrigez-les pour pouvoir résoudre la grille.",
-                          icon="error")
+                showerror(
+                    INCORRECT_GRID_MESSAGE_BOX_TITLE,
+                    CONFLICTS_MESSAGE_BOX_TEXT,
+                    icon="error",
+                )
             return False
 
     def check(self, *args):
@@ -499,30 +717,39 @@ class Gr1d(Frame):
                             for box in box1, box2:
                                 box.config(style="ErrorBox.ErrorArea.Box.TEntry")
                 for box in self.app.gr1d[area][index]:
-                    if self.conflicts_shown and not box.digit.get() and not box.possible_digits:
+                    if (
+                        self.conflicts_shown
+                        and not box.digit.get()
+                        and not box.possible_digits
+                    ):
                         box.config(style="ErrorBox.ErrorArea.Box.TEntry")
         if not self.progress_box:
             # Check if grid is solved
             if self.correct:
                 if sum(box.digit.get() == "" for box in self) == 0:
-                    self.app.menu.grid.entryconfigure("Résoudre", state=DISABLED)
+                    self.app.menu.grid.entryconfigure(SOLVE_LABEL, state=DISABLED)
                     self.app.game.erase_enabled = True
-                    showinfo("Bravo !", "La grille est résolue.")
+                    showinfo(
+                        SOLVED_GRID_MESSAGE_BOX_TITLE, SOLVED_GRID_MESSAGE_BOX_TEXT
+                    )
                 else:  # Focus to the easiest box to solve
                     try:
-                        next(box for box in self
-                             if not box.digit.get()\
-                                and len(box.possible_digits) == 1\
-                                and HighlightButton.digit in {""}|box.possible_digits).focus_set()
+                        next(
+                            box
+                            for box in self
+                            if not box.digit.get()
+                            and len(box.possible_digits) == 1
+                            and HighlightButton.digit in {""} | box.possible_digits
+                        ).focus_set()
                     except StopIteration:
                         pass
             self.solutions = self.solution_generator()
-            self.app.menu.grid.entryconfigure("Valider",        state=NORMAL)
-            self.app.menu.grid.entryconfigure("Éditer",         state=NORMAL)
-            self.app.menu.grid.entryconfigure("Résoudre",       state=NORMAL)
-            self.app.menu.game.entryconfigure("Charger...",     state=NORMAL)
-            self.app.menu.game.entryconfigure("Sauvegarder...", state=NORMAL)
-            self.app.menu.game.entryconfigure("Redémarrer...",  state=NORMAL)
+            self.app.menu.grid.entryconfigure(VALIDATE_LABEL, state=NORMAL)
+            self.app.menu.grid.entryconfigure(EDIT_LABEL, state=NORMAL)
+            self.app.menu.grid.entryconfigure(SOLVE_LABEL, state=NORMAL)
+            self.app.menu.game.entryconfigure(LOAD_LABEL, state=NORMAL)
+            self.app.menu.game.entryconfigure(SAVE_LABEL, state=NORMAL)
+            self.app.menu.game.entryconfigure(RESTART_LABEL, state=NORMAL)
 
     def solution_generator(self, nb_recursion=1):
         """
@@ -533,70 +760,100 @@ class Gr1d(Frame):
         shuffle(empty_boxes)
         another_digit_found = True
         # Find sure digits: when there is only 1 possible digit in the box
-        while self.correct and empty_boxes and another_digit_found and not self.progress_box.cancel_pressed:
+        while (
+            self.correct
+            and empty_boxes
+            and another_digit_found
+            and not self.progress_box.cancel_pressed
+        ):
             another_digit_found = False
             for box in empty_boxes:
                 if box.possible_digits:
                     if len(box.possible_digits) == 1:
                         box.digit.set(box.possible_digits.pop())
-                        if self.progress_box.title() == "Résolution de la grille" \
-                                or self.progress_box.text.get() == "Génération d'une nouvelle grille...":
-                            if self.progress_box.text.get() == "Génération d'une nouvelle grille...":
+                        if (
+                            self.progress_box.title() == SOLVING_PROGRESS_BOX_TITLE
+                            or self.progress_box.text.get()
+                            == GENERATE_PROGRESS_BOX_TEXT
+                        ):
+                            if (
+                                self.progress_box.text.get()
+                                == GENERATE_PROGRESS_BOX_TEXT
+                            ):
                                 box.state(("disabled",))
                                 box.update()
-                            self.progress_box.variable.set(self.progress_box.variable.get() + 1 / nb_recursion)
+                            self.progress_box.variable.set(
+                                self.progress_box.variable.get() + 1 / nb_recursion
+                            )
                         found_boxes.append(box)
                         empty_boxes.remove(box)
                         another_digit_found = True
         if self.progress_box.cancel_pressed:
             self.solutions = self.solution_generator()
-            raise CancelInterrupt("Annulation")
+            raise CancelInterrupt(CANCEL_EXCEPTION)
         # Try every possible digits
         elif self.correct:
             if empty_boxes:
                 empty_boxes.sort(key=lambda box: len(box.possible_digits))
                 tested_box = empty_boxes[0]
-                digits_to_try = sample(tested_box.possible_digits, len(tested_box.possible_digits))
+                digits_to_try = sample(
+                    tested_box.possible_digits, len(tested_box.possible_digits)
+                )
                 for tested_digit in digits_to_try:
                     tested_box.digit.set(tested_digit)
-                    if self.progress_box.title() == "Résolution de la grille":
-                        self.progress_box.text.set("Essai : " + tested_digit + " en " + str(tested_box))
-                    elif self.progress_box.text.get() == "Génération d'une nouvelle grille...":
+                    if self.progress_box.title() == SOLVING_PROGRESS_BOX_TITLE:
+                        self.progress_box.text.set(
+                            TESTS_PROGRESS_BOX_TEXT.format(
+                                tested_digit, str(tested_box)
+                            )
+                        )
+                    elif self.progress_box.text.get() == GENERATE_PROGRESS_BOX_TEXT:
                         tested_box.state(("disabled",))
                         tested_box.update()
-                    self.progress_box.variable.set(self.progress_box.variable.get() + 1 / nb_recursion)
-                    yield from self.solution_generator(1 if self.progress_box.text.get() == "Génération d'une nouvelle grille..." else nb_recursion + 1)
+                    self.progress_box.variable.set(
+                        self.progress_box.variable.get() + 1 / nb_recursion
+                    )
+                    yield from self.solution_generator(
+                        1
+                        if self.progress_box.text.get() == GENERATE_PROGRESS_BOX_TEXT
+                        else nb_recursion + 1
+                    )
                     for box in empty_boxes:
                         if box.digit.get():
-                            if self.progress_box.title() == "Génération d'une grille":
+                            if self.progress_box.title() == GENERATE_PROGRESS_BOX_TITLE:
                                 box.state(("!disabled",))
                             box.digit.set("")
             else:
                 yield None
         else:
             # Incorrect grid, maybe a wrong hypothesis
-            self.app.menu.grid.entryconfigure("Résoudre", state=DISABLED)
-            raise StopIteration("La grille comporte des erreurs. Corrigez-les pour pouvoir résoudre la grille.")
+            self.app.menu.grid.entryconfigure(SOLVE_LABEL, state=DISABLED)
+            raise StopIteration(NO_SOLUTION_EXCEPTION)
         for box in found_boxes:
-            if self.progress_box.title() == "Génération d'une grille":
+            if self.progress_box.title() == GENERATE_PROGRESS_BOX_TITLE:
                 box.state(("!disabled",))
             box.digit.set("")
-        self.app.menu.grid.entryconfigure("Résoudre", state=DISABLED)
+        self.app.menu.grid.entryconfigure(SOLVE_LABEL, state=DISABLED)
 
     def set_box_focus(self, box, row_delta, col_delta):
         """ Select an enabled adjacent box """
         row, col = box.row, box.col
         keep_browse = True
         while keep_browse:
-            col += col_delta; row += row_delta
+            col += col_delta
+            row += row_delta
             if col > 8:
-                          col = 0; row = (row + 1) % 9
+                col = 0
+                row = (row + 1) % 9
             elif col < 0:
-                          col = 8; row = (row - 1) % 9
+                col = 8
+                row = (row - 1) % 9
             if row < 0:
-                          row = 8; col = (col - 1) % 9
+                row = 8
+                col = (col - 1) % 9
             elif row > 8:
-                          row = 0; col = (col + 1) % 9
+                row = 0
+                col = (col + 1) % 9
             keep_browse = self.rows[row][col].instate(("disabled",))
         self.rows[row][col].focus_set()
 
@@ -605,6 +862,7 @@ class Region(Frame):
     """
     3x3 boxes subgrid/region
     """
+
     def __init__(self, grid, reg_row, reg_col):
         Frame.__init__(self, grid, relief=SUNKEN, borderwidth=2)
         self.grid(row=reg_row, column=reg_col, sticky="nswe")
@@ -619,21 +877,23 @@ class Box(ttk.Entry):
         self.app = app
         self.digit = StringVar()
         self.digit.trace_variable("w", self.on_digit_change)
-        ttk.Entry.__init__(self,
-                           region,
-                           textvariable    = self.digit,
-                           style           = "Box.TEntry",
-                           font            = ("Arial", 16),
-                           width           = 2,
-                           justify         = CENTER,
-                           validate        = "key",
-                           validatecommand = (app.register(self.check), "%P"),
-                           *options)
+        ttk.Entry.__init__(
+            self,
+            region,
+            textvariable=self.digit,
+            style="Box.TEntry",
+            font=("Arial", 16),
+            width=2,
+            justify=CENTER,
+            validate="key",
+            validatecommand=(app.register(self.check), "%P"),
+            *options
+        )
         self.state(("disabled",))
         self.row, self.col, self.reg = row, col, reg
         self.possible_digits = set(digits)
         self.grid(row=row % 3, column=col % 3)
-        self.bind("<FocusIn>",        self.on_focus)
+        self.bind("<FocusIn>", self.on_focus)
         self.bind("<KeyPress-Up>", lambda event: gr1d.set_box_focus(self, -1, 0))
         self.bind("<KeyPress-Down>", lambda event: gr1d.set_box_focus(self, +1, 0))
         self.bind("<KeyPress-Left>", lambda event: gr1d.set_box_focus(self, 0, -1))
@@ -669,7 +929,9 @@ class Box(ttk.Entry):
             for box in self.neighbourhood(area):
                 box.possible_digits = set(digits)
                 for box_area in "row", "col", "reg":
-                    box.possible_digits -= {box.digit.get() for box in box.neighbourhood(box_area)}
+                    box.possible_digits -= {
+                        box.digit.get() for box in box.neighbourhood(box_area)
+                    }
                 if self.app.gr1d.tips_shown.get() and box.digit.get() == "":
                     if box.possible_digits:
                         box.tip.text = " ".join(sorted(box.possible_digits)) + " ?"
@@ -678,12 +940,15 @@ class Box(ttk.Entry):
                     box.tip.shown = True
                 else:
                     box.tip.shown = False
-        if not self.app.gr1d.progress_box and not HighlightButton.digit and self.digit.get():
+        if (
+            not self.app.gr1d.progress_box
+            and not HighlightButton.digit
+            and self.digit.get()
+        ):
             self.app.gr1d.set_box_focus(self, 0, +1)
         self.app.gr1d.check()
         if not self.app.gr1d.correct:
             self.focus_set()
-
 
     def show_tips(self, *args):
         """
@@ -696,11 +961,15 @@ class Box(ttk.Entry):
         return "case " + str((self.row + 1, self.col + 1))
 
     def __repr__(self):
-        return str((self.row, self.col)) + str([self.digit.get()]) + str(self.possible_digits)
+        return (
+            str((self.row, self.col))
+            + str([self.digit.get()])
+            + str(self.possible_digits)
+        )
 
 
 class Tooltip:
-    '''
+    """
     It creates a tooltip for a given widget as the mouse goes on it.
 
     see:
@@ -728,37 +997,39 @@ class Tooltip:
       Tested on Ubuntu 16.04/16.10, running Python 3.5.2
 
     TODO: themes styles support
-    '''
+    """
 
     TIP_DELAY = 2000
 
-    def __init__(self, widget,
-                 *,
-                 bg='white',
-                 fg='dim gray',
-                 pad=(3, 2, 3, 2),
-                 text='widget info',
-                 delay=TIP_DELAY,
-                 wraplength=250,
-                 shown=True):
+    def __init__(
+        self,
+        widget,
+        *,
+        bg="white",
+        fg="dim gray",
+        pad=(3, 2, 3, 2),
+        text="widget info",
+        delay=TIP_DELAY,
+        wraplength=250,
+        shown=True
+    ):
 
-
-        self.shown      = shown       #  Added by AM
-        self.delay      = delay       #  in milliseconds, originally 500
+        self.shown = shown  #  Added by AM
+        self.delay = delay  #  in milliseconds, originally 500
         self.wraplength = wraplength  #  in pixels, originally 180
-        self.widget     = widget
-        self.text       = text
-        self.bg         = bg
-        self.fg         = fg
-        self.pad        = pad
-        self.id         = None
-        self.tw         = None
+        self.widget = widget
+        self.text = text
+        self.bg = bg
+        self.fg = fg
+        self.pad = pad
+        self.id = None
+        self.tw = None
         self.widget.bind("<Enter>", self.onEnter)
         self.widget.bind("<Leave>", self.onLeave)
         self.widget.bind("<ButtonPress>", self.onLeave)
 
     def onEnter(self, event=None):
-        if self.shown:                #  Added by AM
+        if self.shown:  #  Added by AM
             self.schedule()
 
     def onLeave(self, event=None):
@@ -776,16 +1047,16 @@ class Tooltip:
             self.widget.after_cancel(id_)
 
     def show(self):
-        def tip_pos_calculator(widget, label,
-                               *,
-                               tip_delta=(10, 5), pad=(5, 3, 5, 3)):
+        def tip_pos_calculator(widget, label, *, tip_delta=(10, 5), pad=(5, 3, 5, 3)):
 
             w = widget
 
             s_width, s_height = w.winfo_screenwidth(), w.winfo_screenheight()
 
-            width, height = (pad[0] + label.winfo_reqwidth() + pad[2],
-                             pad[1] + label.winfo_reqheight() + pad[3])
+            width, height = (
+                pad[0] + label.winfo_reqwidth() + pad[2],
+                pad[1] + label.winfo_reqheight() + pad[3],
+            )
 
             mouse_x, mouse_y = w.winfo_pointerxy()
 
@@ -822,10 +1093,10 @@ class Tooltip:
 
             return x1, y1
 
-        bg      = self.bg
-        fg      = self.fg
-        pad     = self.pad
-        widget  = self.widget
+        bg = self.bg
+        fg = self.fg
+        pad = self.pad
+        widget = self.widget
 
         # creates a toplevel window
         self.tw = Toplevel(widget)
@@ -833,22 +1104,20 @@ class Tooltip:
         # Leaves only the label and removes the app window
         self.tw.wm_overrideredirect(True)
 
-        border  = Frame(self.tw, background=fg)
-        win     = Frame(border,
-                        background  = bg,
-                        borderwidth = 1)
-        label  = Label(win,
-                       text        = self.text,
-                       justify     = LEFT,
-                       background  = bg,
-                       foreground  = fg,
-                       relief      = SOLID,
-                       borderwidth = 0,
-                       wraplength  = self.wraplength)
+        border = Frame(self.tw, background=fg)
+        win = Frame(border, background=bg, borderwidth=1)
+        label = Label(
+            win,
+            text=self.text,
+            justify=LEFT,
+            background=bg,
+            foreground=fg,
+            relief=SOLID,
+            borderwidth=0,
+            wraplength=self.wraplength,
+        )
 
-        label.grid(padx=(pad[0], pad[2]),
-                   pady=(pad[1], pad[3]),
-                   sticky=NSEW)
+        label.grid(padx=(pad[0], pad[2]), pady=(pad[1], pad[3]), sticky=NSEW)
         win.grid(padx=1, pady=1)
         border.grid()
 
@@ -869,49 +1138,55 @@ class NbCluesMessageBox(Toplevel):
     """
 
     DEFAULT_NB_CLUES = 25
-    MIN_NB_CLUES     = 17
-    MAX_NB_CLUES     = 80
+    MIN_NB_CLUES = 17
+    MAX_NB_CLUES = 80
 
     def __init__(self, app):
         Toplevel.__init__(self, app)
         self.app = app
-        self.title("Générer une nouvelle grille")
+        self.title(NB_CLUES_MESSAGE_BOX_TITLE)
         self.resizable(width=False, height=False)
         self.grab_set()
         self.nb_clues = IntVar()
         self.nb_clues.set(NbCluesMessageBox.DEFAULT_NB_CLUES)
         self.nb_clues.trace_variable("w", self.round_nb_clues)
         message_box_frame = ttk.Frame(self)
-        enter_nb_frame    = ttk.Frame(message_box_frame)
-        enter_nb_label    = ttk.Label(enter_nb_frame, text="Entrez le nombre minimum d'indices :")
+        enter_nb_frame = ttk.Frame(message_box_frame)
+        enter_nb_label = ttk.Label(enter_nb_frame, text=NB_CLUES_INPUT_LABEL)
         enter_nb_label.pack(side=LEFT)
-        spinbox = Spinbox(enter_nb_frame,
-                          width        = 2,
-                          from_        = NbCluesMessageBox.MIN_NB_CLUES,
-                          to           = NbCluesMessageBox.MAX_NB_CLUES,
-                          increment    = 1,
-                          textvariable = self.nb_clues)
+        spinbox = Spinbox(
+            enter_nb_frame,
+            width=2,
+            from_=NbCluesMessageBox.MIN_NB_CLUES,
+            to=NbCluesMessageBox.MAX_NB_CLUES,
+            increment=1,
+            textvariable=self.nb_clues,
+        )
         spinbox.pack(side=RIGHT)
         enter_nb_frame.pack(padx=5, pady=5, fill=X)
         scale_frame = ttk.Frame(message_box_frame)
-        simpler_msg = ttk.Label(scale_frame, text="← plus\ndifficile", justify=RIGHT)
+        simpler_msg = ttk.Label(scale_frame, text=HARDER_LABEL, justify=RIGHT)
         simpler_msg.pack(side=LEFT)
-        self.scale = ttk.Scale(scale_frame,
-                               command  = self.round_nb_clues,
-                               length   = 162,
-                               from_    = NbCluesMessageBox.MIN_NB_CLUES,
-                               to       = NbCluesMessageBox.MAX_NB_CLUES,
-                               orient   = HORIZONTAL,
-                               variable = self.nb_clues)
+        self.scale = ttk.Scale(
+            scale_frame,
+            command=self.round_nb_clues,
+            length=162,
+            from_=NbCluesMessageBox.MIN_NB_CLUES,
+            to=NbCluesMessageBox.MAX_NB_CLUES,
+            orient=HORIZONTAL,
+            variable=self.nb_clues,
+        )
         self.scale.pack(side=LEFT, padx=5, pady=5)
-        more_difficult_msg = ttk.Label(scale_frame, text="plus →\nfacile", justify=LEFT)
+        more_difficult_msg = ttk.Label(scale_frame, text=EASIER_LABEL, justify=LEFT)
         more_difficult_msg.pack(side=LEFT, padx=5, pady=5)
         scale_frame.pack(padx=5, pady=5)
         buttons_frame = ttk.Frame(message_box_frame)
-        cancel_button = ttk.Button(buttons_frame, text="Annuler", command=self.destroy)
+        cancel_button = ttk.Button(
+            buttons_frame, text=CANCEL_BUTTON_TEXT, command=self.destroy
+        )
         cancel_button.pack(side=RIGHT, padx=5, pady=5)
         cancel_button.bind("<space>", lambda event: self.destroy())
-        ok_button = ttk.Button(buttons_frame, text="OK", command=self.on_ok)
+        ok_button = ttk.Button(buttons_frame, text=OK_BUTTON_TEXT, command=self.on_ok)
         ok_button.pack(side=RIGHT, padx=5, pady=5)
         ok_button.bind("<space>", self.on_ok)
         ok_button.focus_set()
@@ -926,10 +1201,10 @@ class NbCluesMessageBox(Toplevel):
         except TclError:
             nb = NbCluesMessageBox.MIN_NB_CLUES
         finally:
-            if   nb < NbCluesMessageBox.MIN_NB_CLUES:
-                 nb = NbCluesMessageBox.MIN_NB_CLUES
+            if nb < NbCluesMessageBox.MIN_NB_CLUES:
+                nb = NbCluesMessageBox.MIN_NB_CLUES
             elif nb > NbCluesMessageBox.MAX_NB_CLUES:
-                 nb = NbCluesMessageBox.MAX_NB_CLUES
+                nb = NbCluesMessageBox.MAX_NB_CLUES
             self.nb_clues.set(nb)
             self.update()
 
@@ -947,6 +1222,7 @@ class ProgressBox(Toplevel):
     """
     Message box showing progress used by Gr1d.validate and Gr1d.generate
     """
+
     def __init__(self, app, title="", text="", **options):
         Toplevel.__init__(self, app)
         self.protocol("WM_DELETE_WINDOW", self.on_cancel)
@@ -960,14 +1236,18 @@ class ProgressBox(Toplevel):
         label.pack(anchor=W, padx=10, pady=5)
         self.variable = DoubleVar(0)
         self.variable.trace_variable("w", lambda *args: self.update())
-        self.progress_bar = ttk.Progressbar(frame,
-                                            length    = 250,
-                                            orient    = "horizontal",
-                                            mode      = "determinate",
-                                            variable  = self.variable,
-                                            **options)
+        self.progress_bar = ttk.Progressbar(
+            frame,
+            length=250,
+            orient="horizontal",
+            mode="determinate",
+            variable=self.variable,
+            **options
+        )
         self.progress_bar.pack(padx=10, pady=5)
-        self.cancel_button = ttk.Button(frame, text="Annuler", command=self.on_cancel)
+        self.cancel_button = ttk.Button(
+            frame, text=CANCEL_BUTTON_TEXT, command=self.on_cancel
+        )
         self.cancel_button.bind("<space>", self.on_cancel)
         self.cancel_button.pack(side=RIGHT, padx=10, pady=5)
         self.cancel_pressed = False
@@ -980,7 +1260,7 @@ class ProgressBox(Toplevel):
         Called on Cancel button or quit button press
         """
         self.cancel_button.state(("disabled",))
-        self.text.set("Annulation...")
+        self.text.set(CANCELLED_PROGRESS_BOX_TEXT)
         self.cancel_pressed = True
         self.update()
 
@@ -989,14 +1269,14 @@ class ProgressBox(Toplevel):
         Called on Cancel button or quit button press
         """
         self.cancel_button.state(("disabled",))
-        self.text.set("Arrêt...")
+        self.text.set(STOPPING_PROGRESS_BOX_TEXT)
         self.cancel_pressed = True
         self.update()
 
 
-
 class HighlightButtonsFrame(Frame):
     """ Frame of HighlightButtons looking like a status bar """
+
     def __init__(self, app):
         Frame.__init__(self, app, border=1, relief=SUNKEN)
         self.buttons = [HighlightButton(app, self, digit) for digit in digits]
@@ -1008,18 +1288,16 @@ class HighlightButton(ttk.Button):
     Buttons showing every digits
     Allowing user to see where not to write the selected digit
     """
+
     digit = ""
 
     def __init__(self, app, parent, digit):
         self.digit = digit
         self.pressed = False
         self.app = app
-        ttk.Button.__init__(self, 
-                            parent,
-                            text    = digit,
-                            width   = 2,
-                            padding = "0 0",
-                            command = self.on_click)
+        ttk.Button.__init__(
+            self, parent, text=digit, width=2, padding="0 0", command=self.on_click
+        )
         self.app = app
         self.state(("disabled",))
         self.pack(side="left", expand=True, fill="x")
@@ -1056,6 +1334,7 @@ class Game:
     """
     Game functions
     """
+
     def __init__(self, app):
         self.app = app
         self.erase_enabled = True
@@ -1063,53 +1342,79 @@ class Game:
 
     def confirm_erase(self, force=False):
         """ If a game is started, pop a message box to confirm game erasement """
-        self.erase_enabled = self.erase_enabled or force\
-                             or askokcancel("Effacer la partie en cours ?",
-                                            "Une partie est en cours. Voulez-vous l'effacer ?",
-                                            default="cancel", icon="warning")
+        self.erase_enabled = (
+            self.erase_enabled
+            or force
+            or askokcancel(
+                CONFIRM_ERASE_MESSAGE_BOX_TITLE,
+                CONFIRM_ERASE_MESSAGE_BOX_TEXT,
+                default="cancel",
+                icon="warning",
+            )
+        )
         return self.erase_enabled
 
     def open(self, file_path=""):
         """ Open a game saved in a file """
         if self.confirm_erase():
-            self.file_path = file_path or askopenfilename(parent           = self.app,
-                                                          defaultextension = ".pysudoku",
-                                                          initialdir       = ".",
-                                                          title            = "Ouvrir une partie",
-                                                          filetypes        = [("Partie PySudoku", "*.pysudoku")])
-        if exists(self.file_path):
-            self.app.gr1d.create()
-            with open(self.file_path, "rb") as file:
-                loader = Unpickler(file)
-                try:
-                    HighlightButton.digit = loader.load()
-                    for box in self.app.gr1d:
-                        box.state(("!disabled",))
-                        box.state(loader.load())
-                        box.digit.set(loader.load())
-                except UnpicklingError:
-                    showerror("Erreur de fichier", "Le fichier n'a pas pu être lu.", icon="error")
-                else:
-                    print(basename(self.file_path), basename(self.file_path).rstrip("pysudoku"))
-                    self.app.title(basename(self.file_path).rstrip(".pysudoku")+" - PySudoku")
-                    self.erase_enabled = True
-                    self.app.menu.grid.entryconfigure("Valider",        state=NORMAL)
-                    self.app.self.app.menu.grid.entryconfigure("Éditer",         state=NORMAL)
-                    self.app.menu.grid.entryconfigure("Résoudre",       state=NORMAL)
-                    self.app.menu.game.entryconfigure("Charger...",     state=NORMAL)
-                    self.app.menu.game.entryconfigure("Sauvegarder...", state=DISABLED)
-                    self.app.menu.game.entryconfigure("Redémarrer...",  state=NORMAL)
-        else:
-            showerror("Erreur de fichier", "Le fichier "+basename(file_path)+" n'a pas été trouvé.", icon="error")
+            self.file_path = file_path or askopenfilename(
+                parent=self.app,
+                defaultextension=".pysudoku",
+                initialdir=".",
+                title=OPEN_FILE_MESSAGE_BOX_TITLE,
+                filetypes=[(FILE_TYPE_NAME, "*.pysudoku")],
+            )
+        if self.file_path:
+            if exists(self.file_path):
+                self.app.gr1d.create()
+                with open(self.file_path, "rb") as file:
+                    loader = Unpickler(file)
+                    try:
+                        HighlightButton.digit = loader.load()
+                        for box in self.app.gr1d:
+                            box.state(("!disabled",))
+                            box.state(loader.load())
+                            box.digit.set(loader.load())
+                    except UnpicklingError:
+                        showerror(
+                            FILE_ERROR_MESSAGE_BOX_TITLE,
+                            CORRUPTED_FILE_MESSAGE_BOX_TEXT.format(basename(file_path)),
+                            icon="error",
+                        )
+                    else:
+                        print(
+                            basename(self.file_path),
+                            basename(self.file_path).rstrip(APP_TITLE),
+                        )
+                        self.app.title(
+                            basename(self.file_path).rstrip(".pysudoku") + " - PySudoku"
+                        )
+                        self.erase_enabled = True
+                        self.app.menu.grid.entryconfigure(VALIDATE_LABEL, state=NORMAL)
+                        self.app.self.app.menu.grid.entryconfigure(
+                            EDIT_LABEL, state=NORMAL
+                        )
+                        self.app.menu.grid.entryconfigure(SOLVE_LABEL, state=NORMAL)
+                        self.app.menu.game.entryconfigure(LOAD_LABEL, state=NORMAL)
+                        self.app.menu.game.entryconfigure(SAVE_LABEL, state=DISABLED)
+                        self.app.menu.game.entryconfigure(RESTART_LABEL, state=NORMAL)
+            else:
+                showerror(
+                    FILE_ERROR_MESSAGE_BOX_TITLE,
+                    FILE_NOT_FOUND_MESSAGE_BOX_TEXT.format(basename(file_path)),
+                    icon="error",
+                )
 
     def save(self):
         """ Save a game in a file """
-        save_path = asksaveasfilename(parent           = self.app,
-                                      defaultextension = ".pysudoku",
-                                      initialdir       = dirname(self.file_path),
-                                      initialfile      = basename(self.file_path),
-                                      title            = "Enregistrer la partie",
-                                      filetypes        = [("Partie PySudoku", "*.pysudoku")])
+        save_path = asksaveasfilename(
+            parent=self.app,
+            defaultextension=".pysudoku",
+            initialdir=dirname(self.file_path),
+            initialfile=basename(self.file_path),
+            title=SAVE_FILE_MESSAGE_BOX_TITLE,
+            filetypes=[(FILE_TYPE_NAME, "*.pysudoku")],
+        )
         if save_path:
             self.file_path = save_path
             with open(save_path, "wb") as file:
@@ -1119,7 +1424,7 @@ class Game:
                     saver.dump(box.state())
                     saver.dump(box.digit.get())
             self.erase_enabled = True
-            self.app.title(basename(self.file_path).rstrip(".pysudoku")+" - PySudoku")
+            self.app.title(basename(self.file_path).rstrip(".pysudoku") + " - PySudoku")
         return save_path
 
     def restart(self, force=False):
@@ -1129,68 +1434,71 @@ class Game:
                 if box.instate(("!disabled",)):
                     box.digit.set("")
             self.erase_enabled = True
-            self.app.menu.grid.entryconfigure("Éditer",         state=NORMAL)
-            self.app.menu.grid.entryconfigure("Valider",        state=DISABLED)
-            self.app.menu.grid.entryconfigure("Résoudre",       state=NORMAL)
-            self.app.menu.game.entryconfigure("Charger...",     state=NORMAL)
-            self.app.menu.game.entryconfigure("Sauvegarder...", state=NORMAL)
-            self.app.menu.game.entryconfigure("Redémarrer...",  state=NORMAL)
-
-
+            self.app.menu.grid.entryconfigure(EDIT_LABEL, state=NORMAL)
+            self.app.menu.grid.entryconfigure(VALIDATE_LABEL, state=DISABLED)
+            self.app.menu.grid.entryconfigure(SOLVE_LABEL, state=NORMAL)
+            self.app.menu.game.entryconfigure(LOAD_LABEL, state=NORMAL)
+            self.app.menu.game.entryconfigure(SAVE_LABEL, state=NORMAL)
+            self.app.menu.game.entryconfigure(RESTART_LABEL, state=NORMAL)
 
 
 class App(Tk):
     def __init__(self, argv):
         Tk.__init__(self)
-        self.title("PySudoku")
-        self.iconphoto(True,
-                       PhotoImage(name="icon16", data=ICON16),
-                       PhotoImage(name="icon32", data=ICON32),
-                       PhotoImage(name="icon48", data=ICON48))  # Titlebar
+        self.title(APP_TITLE)
+        self.iconphoto(
+            True,
+            PhotoImage(name="icon16", data=ICON16),
+            PhotoImage(name="icon32", data=ICON32),
+            PhotoImage(name="icon48", data=ICON48),
+        )  # Titlebar
         try:  # Windows taskbar icon
             from ctypes import windll
-            windll.shell32.SetCurrentProcessExplicitAppUserModelID("MALINGREY.Adrien.PySudoku.0.2")
+
+            windll.shell32.SetCurrentProcessExplicitAppUserModelID(
+                "MALINGREY.Adrien.PySudoku.0.2"
+            )
         except ImportError:  # Linux
             pass
         self.resizable(width=False, height=False)
-        self.style               = CustomStyle(self)
-        self.gr1d                = Gr1d(self)  #  leet speak for grid not to confuse with tkinter.Grid.grid method
-        self.highlight_buttons   = HighlightButtonsFrame(self)
-        self.game                = Game(self)
+        self.style = CustomStyle(self)
+        self.gr1d = Gr1d(
+            self
+        )  #  leet speak for grid not to confuse with tkinter.Grid.grid method
+        self.highlight_buttons = HighlightButtonsFrame(self)
+        self.game = Game(self)
         self["menu"] = self.menu = MenuBar(self)  # Window menu bar
         self.protocol("WM_DELETE_WINDOW", self.on_close)  # Action on close button press
         if len(argv) > 1:
             self.game.open(argv[1])
-            
+
     def open_wiki(self):
         """ Open Sudoku article on wikipedia to learn sudoku rules (and more) """
-        open_web_browser("https://fr.wikipedia.org/wiki/Sudoku")
-    
+        open_web_browser(WIKI_URL)
+
     def show_about(self):
         """ About message box """
-        showinfo("À propos de PySudoku",
-                 "Auteur : Adrien Malingrey\n"
-                 "Licence : CC-BY-SA")
-    
-    
+        showinfo(ABOUT_MESSAGE_BOX_TITLE, ABOUT_MESSAGE_BOX_TEXT)
+
     def on_close(self):
         """
         Called on close button press
         Allow user to save started game and quit
         """
-        save_before_close = not self.game.erase_enabled \
-                and askyesnocancel("Enregistrer la partie ?",
-                                   "Une partie est en cours. Voulez-vous l'enregistrer ?",
-                                   icon="warning", default="cancel")
-    
-        if save_before_close != None:       # [Yes] or [No] button pressed (not [Cancel])
-            if save_before_close == True:   # [Yes] button pressed
-                if self.game.save() == "":       # Save dialog box cancelled
-                    self.on_close()              # Ask again
+        save_before_close = not self.game.erase_enabled and askyesnocancel(
+            CLOSE_MESSAGE_BOX_TITLE,
+            CLOSE_MESSAGE_BOX_TITLE,
+            icon="warning",
+            default="cancel",
+        )
+
+        if save_before_close != None:  # [Yes] or [No] button pressed (not [Cancel])
+            if save_before_close == True:  # [Yes] button pressed
+                if self.game.save() == "":  # Save dialog box cancelled
+                    self.on_close()  # Ask again
             self.quit()
-        else :  #[Cancel] button pressed : do nothing
+        else:  # [Cancel] button pressed : do nothing
             pass
-        
 
 
 if __name__ == "__main__":
