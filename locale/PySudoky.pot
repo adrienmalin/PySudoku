@@ -1,0 +1,252 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PySudoku V0.2\n"
+"POT-Creation-Date: 2018-08-02 00:12+0200\n"
+"PO-Revision-Date: 2018-08-02 00:01+0200\n"
+"Last-Translator: \n"
+"Language-Team: Adrien Malingrey adrien.malin@protonmail.com\n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.1.1\n"
+"X-Poedit-Basepath: ..\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-SearchPath-0: PySudoku.py\n"
+
+#: PySudoku.py:35
+msgid "PySudoku"
+msgstr ""
+
+#: PySudoku.py:37
+msgid "Grid"
+msgstr ""
+
+#: PySudoku.py:38
+msgid "Generate..."
+msgstr ""
+
+#: PySudoku.py:39
+msgid "Create"
+msgstr ""
+
+#: PySudoku.py:40
+msgid "Edit"
+msgstr ""
+
+#: PySudoku.py:41
+msgid "Validate"
+msgstr ""
+
+#: PySudoku.py:42
+msgid "Solve"
+msgstr ""
+
+#: PySudoku.py:44
+msgid "Game"
+msgstr ""
+
+#: PySudoku.py:45
+msgid "Load..."
+msgstr ""
+
+#: PySudoku.py:46
+msgid "Save..."
+msgstr ""
+
+#: PySudoku.py:47
+msgid "Restart..."
+msgstr ""
+
+#: PySudoku.py:49
+msgid "View"
+msgstr ""
+
+#: PySudoku.py:50
+msgid "Theme"
+msgstr ""
+
+#: PySudoku.py:51
+msgid "Show tips"
+msgstr ""
+
+#: PySudoku.py:52
+msgid "Show conflicts"
+msgstr ""
+
+#: PySudoku.py:54
+msgid "?"
+msgstr ""
+
+#: PySudoku.py:55
+msgid "Wikipedia"
+msgstr ""
+
+#: PySudoku.py:56
+msgid "About..."
+msgstr ""
+
+#: PySudoku.py:58
+msgid "Grid generation"
+msgstr ""
+
+#: PySudoku.py:59
+msgid "Generating a new grid..."
+msgstr ""
+
+#: PySudoku.py:60
+msgid "Deleting clues..."
+msgstr ""
+
+#: PySudoku.py:61
+msgid "Stop"
+msgstr ""
+
+#: PySudoku.py:63
+msgid "Grid validation"
+msgstr ""
+
+#: PySudoku.py:64
+msgid "Checking if grid has a solution..."
+msgstr ""
+
+#: PySudoku.py:66
+msgid "Can't solve grid"
+msgstr ""
+
+#: PySudoku.py:68
+msgid "Some boxes have no solution. Please correct it."
+msgstr ""
+
+#: PySudoku.py:71
+msgid "Checking if grid has other solutions..."
+msgstr ""
+
+#: PySudoku.py:73
+msgid "Incorrect grid"
+msgstr ""
+
+#: PySudoku.py:74
+msgid "The grid has several solutions."
+msgstr ""
+
+#: PySudoku.py:76
+msgid ""
+"Some boxes from the same row, column or region have same digit. Please "
+"correct them."
+msgstr ""
+
+#: PySudoku.py:80
+msgid "Solving grid"
+msgstr ""
+
+#: PySudoku.py:81
+msgid "Calculating sure digits..."
+msgstr ""
+
+#: PySudoku.py:82
+msgid "Test: {} on {}"
+msgstr ""
+
+#: PySudoku.py:84
+msgid "There are some error. Please correct them to solve the grid."
+msgstr ""
+
+#: PySudoku.py:87
+msgid "Cancelled"
+msgstr ""
+
+#: PySudoku.py:89
+msgid "Congratulations!"
+msgstr ""
+
+#: PySudoku.py:90
+msgid "The grid is solved."
+msgstr ""
+
+#: PySudoku.py:92
+msgid "Generate a new grid"
+msgstr ""
+
+#: PySudoku.py:93
+msgid "Please enter minimum number of clues:"
+msgstr ""
+
+#: PySudoku.py:94
+msgid "← harder"
+msgstr ""
+
+#: PySudoku.py:95
+msgid "easier →"
+msgstr ""
+
+#: PySudoku.py:96
+msgid "Cancel"
+msgstr ""
+
+#: PySudoku.py:97
+msgid "OK"
+msgstr ""
+
+#: PySudoku.py:99
+msgid "Cancelling..."
+msgstr ""
+
+#: PySudoku.py:100
+msgid "Stopping..."
+msgstr ""
+
+#: PySudoku.py:102
+msgid "Erase current game?"
+msgstr ""
+
+#: PySudoku.py:103
+msgid "A game is in progress. Do you want to erase it?"
+msgstr ""
+
+#: PySudoku.py:105
+msgid "Open game"
+msgstr ""
+
+#: PySudoku.py:106
+msgid "PySudoku game"
+msgstr ""
+
+#: PySudoku.py:107
+msgid "File error"
+msgstr ""
+
+#: PySudoku.py:108
+msgid "The file {} can't be read."
+msgstr ""
+
+#: PySudoku.py:109
+msgid "The file {} can't be found."
+msgstr ""
+
+#: PySudoku.py:111
+msgid "Save game"
+msgstr ""
+
+#: PySudoku.py:113
+msgid "https://en.wikipedia.org/wiki/Sudoku"
+msgstr ""
+
+#: PySudoku.py:115
+msgid "About PySudoku"
+msgstr ""
+
+#: PySudoku.py:116
+msgid ""
+"Author: Adrien Malingrey\n"
+"Licence: MIT"
+msgstr ""
+
+#: PySudoku.py:118
+msgid "Save game?"
+msgstr ""
+
+#: PySudoku.py:119
+msgid "A game is in progress. Would you like to save it?"
+msgstr ""

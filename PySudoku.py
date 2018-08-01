@@ -6,7 +6,10 @@ PySudoku v0.2 by Adrien MALINGREY
 Sudoku game assistant
 Tested on Windows 10 with Python 3.6.3 and Linux Mint 18 with Python 3.5.1
 """
+
 try:
+    import gettext
+    from sys import argv, exit
     from tkinter import *
     from tkinter import ttk
     from tkinter.filedialog import askopenfilename, asksaveasfilename
@@ -16,98 +19,106 @@ try:
     from os.path import basename, dirname, exists
     from random import sample, shuffle
     from webbrowser import open as open_web_browser
-    from sys import argv, exit
     from string import digits
 except ImportError as e:
     exit(e.msg)
 
+# Translation
+try:
+    gettext.find('PySudoku')
+    translator = gettext.translation('PySudoku', localedir='locale')
+except FileNotFoundError:
+    gettext.install('Translation not found')
+else:
+    translator.install('PySudoku')
+
 
 # Labels
-APP_TITLE = "PySudoku"
+APP_TITLE = _("PySudoku")
 
-GRID_LABEL = "Grid"
-GENERATE_LABEL = "Generate..."
-CREATE_LABEL = "Create"
-EDIT_LABEL = "Edit"
-VALIDATE_LABEL = "Validate"
-SOLVE_LABEL = "Solve"
+GRID_LABEL = _("Grid")
+GENERATE_LABEL = _("Generate...")
+CREATE_LABEL = _("Create")
+EDIT_LABEL = _("Edit")
+VALIDATE_LABEL = _("Validate")
+SOLVE_LABEL = _("Solve")
 
-GAME_LABEL = "Game"
-LOAD_LABEL = "Load..."
-SAVE_LABEL = "Save..."
-RESTART_LABEL = "Restart..."
+GAME_LABEL = _("Game")
+LOAD_LABEL = _("Load...")
+SAVE_LABEL = _("Save...")
+RESTART_LABEL = _("Restart...")
 
-VIEW_LABEL = "View"
-THEME_LABEL = "Theme"
-SHOW_TIPS_LABEL = "Show tips"
-SHOW_CONFLICTS_LABEL = "Show conflicts"
+VIEW_LABEL = _("View")
+THEME_LABEL = _("Theme")
+SHOW_TIPS_LABEL = _("Show tips")
+SHOW_CONFLICTS_LABEL = _("Show conflicts")
 
-HELP_LABEL = "?"
-WIKI_LABEL = "Wikipedia"
-ABOUT_LABEL = "About..."
+HELP_LABEL = _("?")
+WIKI_LABEL = _("Wikipedia")
+ABOUT_LABEL = _("About...")
 
-GENERATE_PROGRESS_BOX_TITLE = "Grid generation"
-GENERATE_PROGRESS_BOX_TEXT = "Generating a new grid..."
-CLUES_DELETING_PROGRESS_BOX_TEXT = "Deleting clues..."
-CANCEL_AUTO_CREATE_BUTTON_TEXT = "Stop"
+GENERATE_PROGRESS_BOX_TITLE = _("Grid generation")
+GENERATE_PROGRESS_BOX_TEXT = _("Generating a new grid...")
+CLUES_DELETING_PROGRESS_BOX_TEXT = _("Deleting clues...")
+CANCEL_AUTO_CREATE_BUTTON_TEXT = _("Stop")
 
-VALIDATION_PROGRESS_BOX_TITLE = "Grid validation"
-VALIDATION_PROGRESS_BOX_TEXT = "Checking if grid has a unique solution..."
+VALIDATION_PROGRESS_BOX_TITLE = _("Grid validation")
+VALIDATION_PROGRESS_BOX_TEXT = _("Checking if grid has a solution...")
 
-NO_SOLUTION_MESSAGE_BOX_TITLE = "Can't solve grid"
+NO_SOLUTION_MESSAGE_BOX_TITLE = _("Can't solve grid")
 NO_SOLUTION_MESSAGE_BOX_TEXT = (
-    "Some boxes have no solution. "
-    "Please correct it."
+    _("Some boxes have no solution. "
+      "Please correct it.")
 )
-NO_OTHER_SOLUTION_PROGESS_BOX_TEXT = "Checking if grid has other solutions..."
+NO_OTHER_SOLUTION_PROGESS_BOX_TEXT =_( "Checking if grid has other solutions...")
 
-INCORRECT_GRID_MESSAGE_BOX_TITLE = "Incorrect grid"
-SEVERAL_SOLUTIONS_MESSAGE_BOX_TEXT = "The grid has several solutions."
+INCORRECT_GRID_MESSAGE_BOX_TITLE = _("Incorrect grid")
+SEVERAL_SOLUTIONS_MESSAGE_BOX_TEXT = _("The grid has several solutions.")
 CONFLICTS_MESSAGE_BOX_TEXT = (
-    "Some boxes from the same row, column or region "
-    "have same digit. Please correct them."
+    _("Some boxes from the same row, column or region "
+      "have same digit. Please correct them.")
 )
 
-SOLVING_PROGRESS_BOX_TITLE = "Solving grid"
-CALCULATING_SURE_DIGITS_TEXT = "Calculating sure digits..."
-TESTS_PROGRESS_BOX_TEXT = "Test: {} on {}"
+SOLVING_PROGRESS_BOX_TITLE = _("Solving grid")
+CALCULATING_SURE_DIGITS_TEXT = _("Calculating sure digits...")
+TESTS_PROGRESS_BOX_TEXT = _("Test: {} on {}")
 NO_SOLUTION_EXCEPTION = (
-    "There are some error. "
-    "Please correct them to solve the grid."
+    _("There are some error. "
+      "Please correct them to solve the grid.")
 )
-CANCEL_EXCEPTION = "Cancelled"
+CANCEL_EXCEPTION = _("Cancelled")
 
-SOLVED_GRID_MESSAGE_BOX_TITLE = "Congratulations!"
-SOLVED_GRID_MESSAGE_BOX_TEXT = "The grid is solved."
+SOLVED_GRID_MESSAGE_BOX_TITLE = _("Congratulations!")
+SOLVED_GRID_MESSAGE_BOX_TEXT = _("The grid is solved.")
 
-NB_CLUES_MESSAGE_BOX_TITLE = "Generate a new grid"
-NB_CLUES_INPUT_LABEL = "Please enter minimum number of clues:"
-HARDER_LABEL = "← harder"
-EASIER_LABEL = "easier →"
-CANCEL_BUTTON_TEXT = "Cancel"
-OK_BUTTON_TEXT = "OK"
+NB_CLUES_MESSAGE_BOX_TITLE = _("Generate a new grid")
+NB_CLUES_INPUT_LABEL = _("Please enter minimum number of clues:")
+HARDER_LABEL = _("← harder")
+EASIER_LABEL = _("easier →")
+CANCEL_BUTTON_TEXT = _("Cancel")
+OK_BUTTON_TEXT = _("OK")
 
-CANCELLED_PROGRESS_BOX_TEXT = "Cancelling..."
-STOPPING_PROGRESS_BOX_TEXT = "Stopping..."
+CANCELLED_PROGRESS_BOX_TEXT = _("Cancelling...")
+STOPPING_PROGRESS_BOX_TEXT = _("Stopping...")
 
-CONFIRM_ERASE_MESSAGE_BOX_TITLE = "Erase the current game?"
-CONFIRM_ERASE_MESSAGE_BOX_TEXT = "A game is in progress. Do you want to erase it?"
+CONFIRM_ERASE_MESSAGE_BOX_TITLE = _("Erase current game?")
+CONFIRM_ERASE_MESSAGE_BOX_TEXT = _("A game is in progress. Do you want to erase it?")
 
-OPEN_FILE_MESSAGE_BOX_TITLE = "Open game"
-FILE_TYPE_NAME = "PySudoku game"
-FILE_ERROR_MESSAGE_BOX_TITLE = "File error"
-CORRUPTED_FILE_MESSAGE_BOX_TEXT = "The file {} can't be read."
-FILE_NOT_FOUND_MESSAGE_BOX_TEXT = "The file {} can't be found."
+OPEN_FILE_MESSAGE_BOX_TITLE = _("Open game")
+FILE_TYPE_NAME = _("PySudoku game")
+FILE_ERROR_MESSAGE_BOX_TITLE = _("File error")
+CORRUPTED_FILE_MESSAGE_BOX_TEXT = _("The file {} can't be read.")
+FILE_NOT_FOUND_MESSAGE_BOX_TEXT = _("The file {} can't be found.")
 
-SAVE_FILE_MESSAGE_BOX_TITLE = "Save game"
+SAVE_FILE_MESSAGE_BOX_TITLE = _("Save game")
 
-WIKI_URL = "https://en.wikipedia.org/wiki/Sudoku"
+WIKI_URL = _("https://en.wikipedia.org/wiki/Sudoku")
 
-ABOUT_MESSAGE_BOX_TITLE = "About PySudoku"
-ABOUT_MESSAGE_BOX_TEXT = "Author: Adrien Malingrey\n" "Licence: MIT"
+ABOUT_MESSAGE_BOX_TITLE = _("About PySudoku")
+ABOUT_MESSAGE_BOX_TEXT = _("Author: Adrien Malingrey\n" "Licence: MIT")
 
-CLOSE_MESSAGE_BOX_TITLE = "Save game?"
-CLOSE_MESSAGE_BOX_TITLE = "A game is in progress. Would you like to save it?"
+CLOSE_MESSAGE_BOX_TITLE = _("Save game?")
+CLOSE_MESSAGE_BOX_TITLE = _("A game is in progress. Would you like to save it?")
 
 # 16x16, 32x32, 48x48 gif images encoded in base64
 ICON16 = """
@@ -1451,7 +1462,8 @@ class App(Tk):
             PhotoImage(name="icon16", data=ICON16),
             PhotoImage(name="icon32", data=ICON32),
             PhotoImage(name="icon48", data=ICON48),
-        )  # Titlebar
+        )
+        # Titlebar
         try:  # Windows taskbar icon
             from ctypes import windll
 
